@@ -1,10 +1,15 @@
 //#include "process.h"
 #include "node.h"
 #include "user.h"
+#include "cpu.h"
 #include <stdio.h>
 #include <stdlib.h>
 //Test
-int main(){
+int main(int argc, char  *argv[]){
+	if(argc != 2){printf("%d Worng number of inputs, should be ./run int\n",argc);return 0;}
+	int num_cpu = atoi(argv[1]);
+	//printf("%d \n",num_cpu );
+	struct cpu cpus[num_cpu];
 	char dump[100];
 	int time = 0;
 	int i =0;
@@ -36,7 +41,13 @@ int main(){
 		}
 		i++;
 	}
-	printf("time 	Job\n");
+	char cpu_jobs[num_cpu];
+	printf("time");
+	for(i = 0;i<num_cpu;i++){
+		printf("	CPU%d",i+1);
+		cpu_jobs[i]='*';
+	}
+	printf("\n");
 	time = min;
 	while(*job_list != NULL){ // while there are still jobs
 		struct node *cur = (struct node *) malloc(sizeof(struct node));
