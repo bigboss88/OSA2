@@ -31,7 +31,7 @@ int doWork(struct cpu *acpu){
 //	printf("WORKING ON JOB %c\n",acpu->cur_job );
 //	printf("%d\n", acpu.job->dur);
 	acpu->job->dur--;
-	printf("Did work\n" );
+//	printf("Did work\n" );
 	return 1;
 }
 

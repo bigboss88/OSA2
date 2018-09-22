@@ -59,8 +59,13 @@ void print_CPUS(struct cpu cpus[],int num_cpu,int time){
 	printf("%d 	",time);
 	for(i;i<num_cpu;i++){
 		if(cpus[i].cur_job != '*'){
-			printf("%c",cpus[i].cur_job);
+			printf("%c	",cpus[i].cur_job);
 		}
+		else{
+			printf("	");
+		}
+	}
+	printf("\n");
 }
 
 int main(int argc, char  *argv[]){
@@ -108,7 +113,7 @@ int main(int argc, char  *argv[]){
 	}
 	printf("\n");
 	time = min;
-	while(*job_list != NULL && time <= 10){ // while there are still jobs
+	while(*job_list != NULL){ // while there are still jobs
 		struct node *cur = (struct node *) malloc(sizeof(struct node));
 		cur = *job_list;
 	//	printf("SET CUR \n");
@@ -135,12 +140,12 @@ int main(int argc, char  *argv[]){
 			cur = cur->next;
 		}
 
-		printf("time = %d\n",time );
+		print_CPUS(cpus,num_cpu,time);
 		work_CPUS(cpus,num_cpu);
 		time++;
 		//printf("redo loop\n");
 	}
-	//printf("%d 	IDLE\n", time++);
+	printf("%d 	IDLE\n", time++);
 	printf("\nSummary\n");
 	print_USERlist(user_list);
 	delete_list(job_list);
