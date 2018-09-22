@@ -5,6 +5,64 @@
 #include <stdio.h>
 #include <stdlib.h>
 //Test
+int find_CPU(struct cpu cpus[], int num_cpu,struct node *job){
+//	printf("In find CPU\n");
+	int i =0;
+	//Firt look to see if the job is being worked on already
+	for(i;i<num_cpu;i++){
+		if(cpus[i].cur_job == job->job){return 0;} // if it's already being worked on then ignore it
+	}
+	i=0;
+	//then look for which cpu it should use, first free one, or take over a longer job
+	for(i;i<num_cpu;i++){
+		//printf("%c\n",cpus[i].cur_job);
+		if(cpus[i].cur_job == '*' ){
+			// /printf("Setting in empty cpu\n");
+			setWork(&cpus[i],job);
+			//printf("Job in cpu %d: %c\n",i,cpus[i].cur_job );
+			return 1;
+		}
+	}
+
+	// if they are all full
+
+	i=0;
+	for(i;i<num_cpu;i++){
+		if(cpus[i].job->dur > job-> dur){ // you'll want to replace this job
+			setWork(&cpus[i],job);
+		//	printf("Job in cpu %d: %c\n",i,cpus[i].cur_job );
+			return 1;
+		}
+	}
+	return 0; // else job has to wait
+}
+//Does work on all cpus that has a job
+int work_CPUS(struct cpu cpus[],int num_cpu){
+//	printf("in work CPU\n");
+	int i =0;
+	for(i;i<num_cpu;i++){
+		if(cpus[i].cur_job != '*'){
+		//	printf("Trying to work CPU%d with job %c\n",i, cpus[i].cur_job);
+			doWork(&cpus[i]);
+			//printf(" 	%c\n",cpus[i].cur_job);
+			empty(&cpus[i]);
+		}
+		else{
+		//	printf("	");
+		}
+	}
+	return 1;
+}
+
+void print_CPUS(struct cpu cpus[],int num_cpu,int time){
+	int i =0;
+	printf("%d 	",time);
+	for(i;i<num_cpu;i++){
+		if(cpus[i].cur_job != '*'){
+			printf("%c",cpus[i].cur_job);
+		}
+}
+
 int main(int argc, char  *argv[]){
 	if(argc != 2){printf("%d Worng number of inputs, should be ./run int\n",argc);return 0;}
 	int num_cpu = atoi(argv[1]);
@@ -41,24 +99,29 @@ int main(int argc, char  *argv[]){
 		}
 		i++;
 	}
-	char cpu_jobs[num_cpu];
+	//char cpu_jobs[num_cpu];
 	printf("time");
 	for(i = 0;i<num_cpu;i++){
+		cpus[i] = init_CPU();
 		printf("	CPU%d",i+1);
-		cpu_jobs[i]='*';
+		//cpu_jobs[i]='*';
 	}
 	printf("\n");
 	time = min;
-	while(*job_list != NULL){ // while there are still jobs
+	while(*job_list != NULL && time <= 10){ // while there are still jobs
 		struct node *cur = (struct node *) malloc(sizeof(struct node));
 		cur = *job_list;
-		struct node *work = (struct node *) malloc(sizeof(struct node*)); // this is one that should be worked on
-		work = cur;
+	//	printf("SET CUR \n");
+		//struct node *work = (struct node *) malloc(sizeof(struct node*)); // this is one that should be worked on
+		//work = cur;
 		while (cur != NULL){ // go through list
-			if(work ==NULL ){work = cur;}
-			if(cur->dur < work->dur && cur->arr <= time){ // The one that should be worked on
+		//	if(work ==NULL ){work = cur;}
+	//	printf("looking at stuff\n");
+			if(cur->arr <= time){ // if it has arrived
 				//has arrived and is smallest dur
-				work = cur;
+				// printf("looking for cpu for job %c\n",cur->job);
+				find_CPU(cpus, num_cpu,cur);
+				//print_CPUS(cpus,num_cpu);
 			}
 			if(cur->dur == 1){ // if this job is done remove it for some reason it will work on 0 so I set to 1
 				struct node *tmp = (struct node *) malloc(sizeof(struct node));
@@ -67,21 +130,23 @@ int main(int argc, char  *argv[]){
 				cur = cur->next;
 				pop(job_list,tmp->job);
 			}
-
 			if(cur == NULL){break;}
+
 			cur = cur->next;
 		}
 
-
-		if(work!=NULL && work->dur>0){ // if you found a job
-			work->dur = work->dur -1;
-			printf("%d 	%c\n",time,work->job);
-		}
+		printf("time = %d\n",time );
+		work_CPUS(cpus,num_cpu);
 		time++;
+		//printf("redo loop\n");
 	}
-	printf("%d 	IDLE\n", time++);
+	//printf("%d 	IDLE\n", time++);
 	printf("\nSummary\n");
 	print_USERlist(user_list);
 	delete_list(job_list);
 	delete_USERlist(user_list);
+	i=0;
+	for(i;i<num_cpu;i++){
+		destroy_CPU(cpus[i]);
+	}
 }

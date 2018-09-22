@@ -6,30 +6,41 @@
 struct cpu init_CPU(){
 	struct cpu ncpu;
 	ncpu.job = NULL;
+	ncpu.cur_job = '*';
 	return ncpu;
 }
 
-int setWork(struct cpu acpu ,struct node *job,char *cpus, int num_core){
-	//before it adds the job it checks to see if that job is being worked
-	int i =0;
-	for(i;i<num_core;i++){
-		if(job->job == cpus[i]){return 0;} // can't give it a job if that jobs already being done
-	}
-	apcu.job= job->job;
-
+int setWork(struct cpu *acpu ,struct node *job){
+	// sets the cpu job
+	//printf("Setting work : %c\n",job->job );
+	acpu->job = job;
+	acpu->cur_job = job->job;
+return 1;
 }
 
 int empty(struct cpu *acpu){
 	acpu->job = NULL;
+	acpu->cur_job = '*';
 	return 1;
 }
 
 int doWork(struct cpu *acpu){
-	if(acpu->job == NULL){return 0;} // No work to be done
+//	printf("In do work: %c\n",acpu->cur_job);
+	if(acpu->cur_job == '*'){return 0;} // No work to be done
+	//printf("Trying to accsess job\n");
+//	printf("WORKING ON JOB %c\n",acpu->cur_job );
+//	printf("%d\n", acpu.job->dur);
 	acpu->job->dur--;
+	printf("Did work\n" );
+	return 1;
 }
 
-int hasJob(struct cpu *acpu){
-	if(acpu->job == NULL){return 0;}
-	return 1;
+char hasJob(struct cpu *acpu){
+	if(acpu->job != NULL){return acpu->job->job;}
+	return '*';
+
+}
+
+void destroy_CPU(struct cpu acpu){
+	//free(&acpu);
 }
