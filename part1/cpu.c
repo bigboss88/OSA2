@@ -25,13 +25,8 @@ int empty(struct cpu *acpu){
 }
 
 int doWork(struct cpu *acpu){
-//	printf("In do work: %c\n",acpu->cur_job);
 	if(acpu->cur_job == '*'){return 0;} // No work to be done
-	//printf("Trying to accsess job\n");
-//	printf("WORKING ON JOB %c\n",acpu->cur_job );
-//	printf("%d\n", acpu.job->dur);
 	acpu->job->dur--;
-//	printf("Did work\n" );
 	return 1;
 }
 

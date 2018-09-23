@@ -38,17 +38,11 @@ int find_CPU(struct cpu cpus[], int num_cpu,struct node *job){
 }
 //Does work on all cpus that has a job
 int work_CPUS(struct cpu cpus[],int num_cpu){
-//	printf("in work CPU\n");
 	int i =0;
 	for(i;i<num_cpu;i++){
 		if(cpus[i].cur_job != '*'){
-		//	printf("Trying to work CPU%d with job %c\n",i, cpus[i].cur_job);
 			doWork(&cpus[i]);
-			//printf(" 	%c\n",cpus[i].cur_job);
 			empty(&cpus[i]);
-		}
-		else{
-		//	printf("	");
 		}
 	}
 	return 1;
@@ -71,6 +65,7 @@ void print_CPUS(struct cpu cpus[],int num_cpu,int time){
 int main(int argc, char  *argv[]){
 	if(argc != 2){printf("%d Worng number of inputs, should be ./run int\n",argc);return 0;}
 	int num_cpu = atoi(argv[1]);
+	if(num_cpu < 1){printf("Can't have less than 1 cpu\n");return 0;}
 	//printf("%d \n",num_cpu );
 	struct cpu cpus[num_cpu];
 	char dump[100];
@@ -104,31 +99,27 @@ int main(int argc, char  *argv[]){
 		}
 		i++;
 	}
-	//char cpu_jobs[num_cpu];
 	printf("time");
 	for(i = 0;i<num_cpu;i++){
 		cpus[i] = init_CPU();
 		printf("	CPU%d",i+1);
-		//cpu_jobs[i]='*';
+		
 	}
 	printf("\n");
 	time = min;
 	while(*job_list != NULL){ // while there are still jobs
+		//if(time == 7 ){print_list(job_list);}
 		struct node *cur = (struct node *) malloc(sizeof(struct node));
 		cur = *job_list;
-	//	printf("SET CUR \n");
-		//struct node *work = (struct node *) malloc(sizeof(struct node*)); // this is one that should be worked on
-		//work = cur;
-		while (cur != NULL){ // go through list
-		//	if(work ==NULL ){work = cur;}
-	//	printf("looking at stuff\n");
+
+		while (cur != NULL){ // go through list;
+			
 			if(cur->arr <= time){ // if it has arrived
 				//has arrived and is smallest dur
-				// printf("looking for cpu for job %c\n",cur->job);
+				//printf("dur of usr %d  arr of user %d\n",cur->dur,cur->arr );
 				find_CPU(cpus, num_cpu,cur);
-				//print_CPUS(cpus,num_cpu);
 			}
-			if(cur->dur == 1){ // if this job is done remove it for some reason it will work on 0 so I set to 1
+			if(cur->dur <= 1){ // if this job is done remove it for some reason it will work on 0 so I set to 1
 				struct node *tmp = (struct node *) malloc(sizeof(struct node));
 				tmp =cur;
 				setTime(user_list,tmp->user,time+1);
@@ -143,15 +134,10 @@ int main(int argc, char  *argv[]){
 		print_CPUS(cpus,num_cpu,time);
 		work_CPUS(cpus,num_cpu);
 		time++;
-		//printf("redo loop\n");
 	}
 	printf("%d 	IDLE\n", time++);
 	printf("\nSummary\n");
 	print_USERlist(user_list);
 	delete_list(job_list);
 	delete_USERlist(user_list);
-	i=0;
-	for(i;i<num_cpu;i++){
-		destroy_CPU(cpus[i]);
-	}
 }
